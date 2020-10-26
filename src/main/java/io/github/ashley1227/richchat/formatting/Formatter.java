@@ -80,6 +80,7 @@ public class Formatter {
 	}
 
 	public void reset() {
+		//todo why empty?
 	}
 
 	/**
@@ -120,119 +121,117 @@ public class Formatter {
 		return (LiteralText) (
 				new LiteralText(MENTION_SYMBOL + string)
 						.setStyle(
-								new Style().setUnderline(true).setItalic(true).setColor(BLUE)
-										.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/w " + string + " "))
-						)
-		);
-	}
+								Style.EMPTY.withUnderline(true).withItalic(true).withColor(BLUE)
+										.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+												"/w " + string + " "))));
+			}
 
-	/**
-	 * @param text text to add to
-	 * @param node the node we're adding to the string builder
-	 *             <p>
-	 *             add a markdown node to the string builder.
-	 */
-	public void addNode(LiteralText text, Node node) {
-		if (node == null)
-			return;
-		addFormatting(text, node);
-		if (dirty) {
-			this.dirty = false;
-			text.append(RESET.toString());
-		}
-	}
+			/**
+			 * @param text text to add to
+			 * @param node the node we're adding to the string builder
+			 *             <p>
+			 *             add a markdown node to the string builder.
+			 */
+			public void addNode(LiteralText text, Node node) {
+				if (node == null)
+					return;
+				addFormatting(text, node);
+				if (dirty) {
+					this.dirty = false;
+					text.append(RESET.toString());
+				}
+			}
 
-	/**
-	 * @param text text to add formatting to
-	 * @param node the node to add the formatting from
-	 */
-	public void addFormatting(LiteralText text, Node node) {
-		if (node instanceof Text) {
-			text.append(String.valueOf(node.getChars()));
-			return;
-		}
-		if (node instanceof EmojiNode) {
-			EmojiNode emoji = (EmojiNode) node;
-			text.append(
-					emojiFormatter.format(
-							emoji.getText().toStringOrNull()
+			/**
+			 * @param text text to add formatting to
+			 * @param node the node to add the formatting from
+			 */
+			public void addFormatting(LiteralText text, Node node) {
+				if (node instanceof Text) {
+					text.append(String.valueOf(node.getChars()));
+					return;
+				}
+				if (node instanceof EmojiNode) {
+					EmojiNode emoji = (EmojiNode) node;
+					text.append(emojiFormatter.format(emoji.getText().toStringOrNull()));
+					markDirty();
+					return;
+				}
+				if (node instanceof StrongEmphasis) {
+					text.append(BOLD.toString());
+					addChildren(text, node);
+					markDirty();
+					return;
+				}
+				if (node instanceof Emphasis) {
+					text.append(ITALIC.toString());
+					addChildren(text, node);
+					markDirty();
+					return;
+				}
+				if (node instanceof UnderlineNode) {
+					text.append(UNDERLINE.toString());
+					addChildren(text, node);
+					markDirty();
+					return;
+				}
+				if (node instanceof Strikethrough) {
+					text.append(STRIKETHROUGH.toString());
+					addChildren(text, node);
+					markDirty();
+					return;
+				}
+				if (node instanceof ObfuscatedNode) {
+					text.append(OBFUSCATED.toString());
+					addChildren(text, node);
+					markDirty();
+					return;
+				}
+				if (node instanceof SpoilerNode) {
+					SpoilerNode spoiler = (SpoilerNode) node;
+					LiteralText t = new LiteralText(String.valueOf(spoiler.getText()).replaceAll(".", "▎"));
+					text.append(t);
+
+					Style style = t.getStyle();
+					style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+							format(String.valueOf(spoiler.getText())).get(0)));
+					return;
+				}
+				if (node instanceof Link) {
+					Link link = (Link) node;
+					text.append(genLink(link.getUrl().toStringOrNull(), link.getText().toStringOrNull()));
+					return;
+				}
+				if (node instanceof AutoLink) {
+					AutoLink link = (AutoLink) node;
+					text.append(genLink(link.getUrl().toStringOrNull(), link.getText().toStringOrNull()));
+					return;
+				}
+				if (node instanceof ColorNode) {
+					text.append(ColorCodes.get(String.valueOf(node.getChars())).formatted());
+					return;
+				}
+				if (node instanceof MentionNode) {
+					String name = String.valueOf(node.getChars());
+					text.append(formatPlayerName(name));
+					RichChatMod.playNotificationSound(server, name);
+					return;
+				}
+				addChildren(text, node);
+			}
+
+			public void markDirty() {
+				this.dirty = true;
+			}
+
+			public LiteralText genLink(String URL, String text) {
+				LiteralText linkText = new LiteralText(text);
+				Style style = Style.EMPTY
+					.withClickEvent(
+						new ClickEvent(
+							ClickEvent.Action.OPEN_URL, URL)
 					)
-			);
-			markDirty();
-			return;
-		}
-		if (node instanceof StrongEmphasis) {
-			text.append(BOLD.toString());
-			addChildren(text, node);
-			markDirty();
-			return;
-		}
-		if (node instanceof Emphasis) {
-			text.append(ITALIC.toString());
-			addChildren(text, node);
-			markDirty();
-			return;
-		}
-		if (node instanceof UnderlineNode) {
-			text.append(UNDERLINE.toString());
-			addChildren(text, node);
-			markDirty();
-			return;
-		}
-		if (node instanceof Strikethrough) {
-			text.append(STRIKETHROUGH.toString());
-			addChildren(text, node);
-			markDirty();
-			return;
-		}
-		if (node instanceof ObfuscatedNode) {
-			text.append(OBFUSCATED.toString());
-			addChildren(text, node);
-			markDirty();
-			return;
-		}
-		if (node instanceof SpoilerNode) {
-			SpoilerNode spoiler = (SpoilerNode) node;
-			LiteralText t = new LiteralText(String.valueOf(spoiler.getText()).replaceAll(".", "▎"));
-			text.append(t);
-
-			Style style = t.getStyle();
-			style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, format(String.valueOf(spoiler.getText())).get(0)));
-			return;
-		}
-		if (node instanceof Link) {
-			Link link = (Link) node;
-			text.append(genLink(link.getUrl().toStringOrNull(), link.getText().toStringOrNull()));
-			return;
-		}
-		if (node instanceof AutoLink) {
-			AutoLink link = (AutoLink) node;
-			text.append(genLink(link.getUrl().toStringOrNull(), link.getText().toStringOrNull()));
-			return;
-		}
-		if (node instanceof ColorNode) {
-			text.append(ColorCodes.get(String.valueOf(node.getChars())).formatted());
-			return;
-		}
-		if (node instanceof MentionNode) {
-			String name = String.valueOf(node.getChars());
-			text.append(formatPlayerName(name));
-			RichChatMod.playNotificationSound(server, name);
-			return;
-		}
-		addChildren(text, node);
-	}
-
-	public void markDirty() {
-		this.dirty = true;
-	}
-
-	public LiteralText genLink(String URL, String text) {
-		LiteralText linkText = new LiteralText(text);
-		Style style = new Style();
-		style.setClickEvent(new ClickEvent(
-				ClickEvent.Action.OPEN_URL, URL)
-		).setColor(BLUE).setItalic(true).setUnderline(true);
+					.withColor(BLUE).withItalic(true).withUnderline(true);
 		linkText.setStyle(style);
 		return linkText;
 	}
