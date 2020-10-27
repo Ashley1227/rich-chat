@@ -3,16 +3,18 @@ package io.github.ashley1227.richchat.formatting.color;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.minecraft.util.Formatting;
+
 public class ColorCode implements Iterable<String> {
 
 	private String key;
-	private String formatted;
+	private Formatting formatting;
 
 	private ArrayList<String> aliases;
 
-	public ColorCode(String key, String formatted) {
+	public ColorCode(String key, Formatting formatting) {
 		this.key = key;
-		this.formatted = formatted;
+		this.formatting = formatting;
 
 		this.aliases = new ArrayList<>();
 		this.aliases.add(key);
@@ -29,8 +31,8 @@ public class ColorCode implements Iterable<String> {
 		return this.key;
 	}
 
-	public String formatted() {
-		return this.formatted;
+	public Formatting formatting() {
+		return this.formatting;
 	}
 
 	public String toString() {

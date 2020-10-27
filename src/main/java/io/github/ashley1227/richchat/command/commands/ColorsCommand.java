@@ -31,7 +31,7 @@ public class ColorsCommand {
 			}
 			t.append(c.getAliases().get(c.getAliases().size() - 1));
 			t.append("): ");
-			t.append(c.formatted() + c.getKey());
+			t.append(c.formatting().toString() + c.getKey());
 			feedback.add(t);
 		}
 	}

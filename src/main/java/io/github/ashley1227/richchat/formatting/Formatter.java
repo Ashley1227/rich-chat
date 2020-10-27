@@ -158,31 +158,31 @@ public class Formatter {
 					return;
 				}
 				if (node instanceof StrongEmphasis) {
-					text.append(BOLD.toString());
+					text.setStyle(text.getStyle().withFormatting(BOLD));
 					addChildren(text, node);
 					markDirty();
 					return;
 				}
 				if (node instanceof Emphasis) {
-					text.append(ITALIC.toString());
+					text.setStyle(text.getStyle().withFormatting(ITALIC));
 					addChildren(text, node);
 					markDirty();
 					return;
 				}
 				if (node instanceof UnderlineNode) {
-					text.append(UNDERLINE.toString());
+					text.setStyle(text.getStyle().withFormatting(UNDERLINE));
 					addChildren(text, node);
 					markDirty();
 					return;
 				}
 				if (node instanceof Strikethrough) {
-					text.append(STRIKETHROUGH.toString());
+					text.setStyle(text.getStyle().withFormatting(STRIKETHROUGH));
 					addChildren(text, node);
 					markDirty();
 					return;
 				}
 				if (node instanceof ObfuscatedNode) {
-					text.append(OBFUSCATED.toString());
+					text.setStyle(text.getStyle().withFormatting(OBFUSCATED));
 					addChildren(text, node);
 					markDirty();
 					return;
@@ -208,7 +208,7 @@ public class Formatter {
 					return;
 				}
 				if (node instanceof ColorNode) {
-					text.append(ColorCodes.get(String.valueOf(node.getChars())).formatted());
+					text.setStyle(text.getStyle().withFormatting(ColorCodes.get(String.valueOf(node.getChars())).formatting()));
 					return;
 				}
 				if (node instanceof MentionNode) {

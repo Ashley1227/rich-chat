@@ -34,13 +34,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
 		formatter.setServer(server);
 		ArrayList<LiteralText> texts = formatter.format(packet.getChatMessage());
 		this.server.getPlayerManager().broadcastChatMessage(
-				new LiteralText(
-					new TranslatableText(
-						"chat.type.text",
-						this.player.getDisplayName(),
-						texts.get(0)
-					)
-					.getString() //Ugly hack that is needed for client formatting to work
+				new TranslatableText(
+					"chat.type.text",
+					this.player.getDisplayName(),
+					texts.get(0)
 				),
 				MessageType.CHAT,
 				this.player.getUuid()
@@ -48,7 +45,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
 		for(int i = 1; i < texts.size(); i++) {
 			this.server.getPlayerManager().broadcastChatMessage(
-				new LiteralText(texts.get(i).getString()), //todo wtf?
+				texts.get(i),
 				MessageType.CHAT,
 				this.player.getUuid()
 			);
