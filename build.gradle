@@ -1,12 +1,12 @@
 plugins {
-	id 'fabric-loom' version '0.2.7-SNAPSHOT'
+	id 'fabric-loom' version '0.5-SNAPSHOT'
 	id "com.wynprice.cursemaven" version "2.1.4"
 	id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
-compileJava {
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-}
+
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
 version = "${mod_version}+${project.minecraft_version}"
@@ -19,8 +19,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "io.github.prospector:modmenu:1.10.2+build.32";
-
+	
 	shadow "com.vladsch.flexmark:flexmark:${project.flexmark_version}"
 	implementation "com.vladsch.flexmark:flexmark:${project.flexmark_version}"
 

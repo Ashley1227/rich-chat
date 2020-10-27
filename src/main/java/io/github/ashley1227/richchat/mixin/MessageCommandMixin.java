@@ -30,11 +30,9 @@ public abstract class MessageCommandMixin {
 		ArrayList<LiteralText> texts = formatter.format(message.asString());
 
 		for(ServerPlayerEntity p : targets) {
-			p.sendMessage((new TranslatableText("commands.message.display.incoming", formatter.formatPlayerName(source.getDisplayName().asString()), texts.get(0))));
+			p.sendMessage((new TranslatableText("commands.message.display.incoming", formatter.formatPlayerName(source.getDisplayName().asString()), texts.get(0))), false);
 			for (int i = 1; i < texts.size(); i++) {
-				p.sendMessage(
-						texts.get(i)
-				);
+				p.sendMessage(texts.get(i), false);
 			}
 			source.sendFeedback((new TranslatableText("commands.message.display.outgoing", formatter.formatPlayerName(source.getDisplayName().asString()), texts.get(0))), false);
 			for (int i = 1; i < texts.size(); i++) {

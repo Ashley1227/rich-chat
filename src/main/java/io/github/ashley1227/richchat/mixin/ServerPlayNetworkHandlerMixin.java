@@ -1,6 +1,7 @@
 package io.github.ashley1227.richchat.mixin;
 
 import io.github.ashley1227.richchat.formatting.Formatter;
+import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -28,21 +29,25 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
 	private final Formatter formatter = new Formatter(server);
 
-	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Z)V"), method = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;onChatMessage(Lnet/minecraft/network/packet/c2s/play/ChatMessageC2SPacket;)V", cancellable = true)
+	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"), method = "onGameMessage", cancellable = true)
 	public void onBroadcastChatMessage(ChatMessageC2SPacket packet, CallbackInfo info) {
 		formatter.setServer(server);
 		ArrayList<LiteralText> texts = formatter.format(packet.getChatMessage());
 		this.server.getPlayerManager().broadcastChatMessage(
-				new TranslatableText("chat.type.text",
-						this.player.getDisplayName(),
-						texts.get(0)),
-				false
+				new TranslatableText(
+					"chat.type.text",
+					this.player.getDisplayName(),
+					texts.get(0)
+				),
+				MessageType.CHAT,
+				this.player.getUuid()
 		);
 
 		for(int i = 1; i < texts.size(); i++) {
 			this.server.getPlayerManager().broadcastChatMessage(
-					texts.get(i),
-					false
+				texts.get(i),
+				MessageType.CHAT,
+				this.player.getUuid()
 			);
 		}
 		info.cancel();
