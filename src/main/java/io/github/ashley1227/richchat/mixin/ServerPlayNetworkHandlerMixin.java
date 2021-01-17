@@ -2,7 +2,6 @@ package io.github.ashley1227.richchat.mixin;
 
 import io.github.ashley1227.richchat.formatting.Formatter;
 import net.minecraft.network.MessageType;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,10 +28,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
 	private final Formatter formatter = new Formatter(server);
 
-	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"), method = "onGameMessage", cancellable = true)
-	public void onBroadcastChatMessage(ChatMessageC2SPacket packet, CallbackInfo info) {
+	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"), method = "method_31286", cancellable = true)
+	public void onBroadcastChatMessage(String string, CallbackInfo info) {
 		formatter.setServer(server);
-		ArrayList<LiteralText> texts = formatter.format(packet.getChatMessage());
+		ArrayList<LiteralText> texts = formatter.format(string);
 		this.server.getPlayerManager().broadcastChatMessage(
 				new TranslatableText(
 					"chat.type.text",
