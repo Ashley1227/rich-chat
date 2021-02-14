@@ -1,6 +1,7 @@
 package io.github.ashley1227.richchat.formatting;
 
 import com.vladsch.flexmark.ast.*;
+import com.vladsch.flexmark.ast.Text;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.gfm.strikethrough.Strikethrough;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
@@ -24,10 +25,9 @@ import io.github.ashley1227.richchat.formatting.extensions.spoiler.SpoilerNode;
 import io.github.ashley1227.richchat.formatting.extensions.underline.UnderlineExtension;
 import io.github.ashley1227.richchat.formatting.extensions.underline.UnderlineNode;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
+import net.minecraft.text.*;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,7 +121,10 @@ public class Formatter {
 		return (LiteralText) (
 				new LiteralText(MENTION_SYMBOL + string)
 						.setStyle(
-								Style.EMPTY.withUnderline(true).withItalic(true).withColor(BLUE)
+								Style.EMPTY
+										.withFormatting(UNDERLINE)
+										.withFormatting(BLUE)
+										.withFormatting(ITALIC)
 										.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
 												"/w " + string + " "))));
 			}
@@ -227,11 +230,13 @@ public class Formatter {
 			public LiteralText genLink(String URL, String text) {
 				LiteralText linkText = new LiteralText(text);
 				Style style = Style.EMPTY
-					.withClickEvent(
+							.withClickEvent(
 						new ClickEvent(
-							ClickEvent.Action.OPEN_URL, URL)
-					)
-					.withColor(BLUE).withItalic(true).withUnderline(true);
+								ClickEvent.Action.OPEN_URL, URL)
+						)
+				.withFormatting(UNDERLINE)
+				.withFormatting(BLUE)
+				.withFormatting(ITALIC);
 		linkText.setStyle(style);
 		return linkText;
 	}
